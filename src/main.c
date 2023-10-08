@@ -16,9 +16,9 @@
 
 // PWM-Konfiguration
 #define PWM_FREQ 1000 // 1000Hz PWM
-#define PWM_RESOLUTION LEDC_TIMER_12_BIT // Auflösung von 10 Bit
+#define PWM_RESOLUTION LEDC_TIMER_16_BIT // Auflösung von 16 Bit = Maximum bei 1000Hz
 #define MIN_DUTY 0 // Minimaler duty cycle Wert
-#define MAX_DUTY 4095 // Maximaler duty cycle Wert
+#define MAX_DUTY 65535 // Maximaler duty cycle Wert
 #define LEDC_CHANNEL LEDC_CHANNEL_0 // Verwenden Sie ein beliebiges LEDC-Kanal
 
 // PIN für LED-Ausgang
@@ -61,6 +61,7 @@ void app_main(void)
         .freq_hz = PWM_FREQ,
         .speed_mode = LEDC_HIGH_SPEED_MODE,
         .timer_num = LEDC_TIMER_0,
+        .clk_cfg = LEDC_USE_APB_CLK,
     };
     ledc_channel_config_t ledc_channel = {
         .channel = LEDC_CHANNEL,
