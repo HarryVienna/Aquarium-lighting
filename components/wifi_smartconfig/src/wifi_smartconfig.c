@@ -155,7 +155,7 @@ static esp_err_t smartconfig_connect(wifi_t *wifi)
     else {
         ESP_LOGE(TAG, "Nothing in flash");
     }
-    
+
     s_connected = false;
     
     /* -------------- Try to connect with stored settings ------------- */
@@ -266,15 +266,15 @@ static void connect_event_handler(void* arg, esp_event_base_t event_base, int32_
         s_connected = true;
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
         ESP_LOGI(TAG,"WIFI_EVENT_STA_DISCONNECTED");
+        xEventGroupClearBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
         if (s_connected) { // WIFI was already connected. Perhaps router down? Try reconnecting 
-            while (true) {
-                esp_wifi_connect();
-                vTaskDelay((1000 * 60) / portTICK_PERIOD_MS); // Wait 1 minute
-            }            
+            ESP_LOGI(TAG,"WIFI was already connected. Perhaps router down? Retry to connect to the AP in 60 second.");
+            vTaskDelay((1000 * 60) / portTICK_PERIOD_MS); // Wait 1 minute
+            esp_wifi_connect();
         }
         else {             // WIFI was not connected. So there is a problem
             if (s_retry_num < MAXIMUM_RETRY) {
-                ESP_LOGI(TAG, "retry to connect to the AP");
+                ESP_LOGI(TAG, "Retry to connect to the AP.");
                 esp_wifi_connect();
                 s_retry_num++;
                 
@@ -283,11 +283,11 @@ static void connect_event_handler(void* arg, esp_event_base_t event_base, int32_
             }
         }
 
-        ESP_LOGI(TAG,"connect to the AP fail");
+        ESP_LOGI(TAG,"Connect to the AP fail");
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ESP_LOGI(TAG,"IP_EVENT_STA_GOT_IP");
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
-        ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
+        ESP_LOGI(TAG, "Got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     } else if (event_base == SC_EVENT && event_id == SC_EVENT_SCAN_DONE) {
