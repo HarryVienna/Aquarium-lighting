@@ -119,7 +119,7 @@ void app_main(void)
     int current_state = 0;
 
     // Maximalwert hängt von PWM_RESOLUTION ab
-    int max_duty = (1 << PWM_RESOLUTION) - 1;  // Bei 10 Bit ist das 1023
+    int max_duty = (1 << PWM_RESOLUTION) - 1;
     ESP_LOGI(TAG, "max_duty %d", max_duty);
 
     while (1) {
